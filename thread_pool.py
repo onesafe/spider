@@ -8,7 +8,7 @@ import sys
 import urllib2
 
 from html_parse import MMHtmlParse
-from thread_run import do_parse
+from thread_run import do_page_parse
 
 #set coding
 reload(sys)
@@ -31,6 +31,7 @@ class ThreadPool(object):
         self.queue = Queue.Queue()
         self.max_threads_num = threads_num
         self.visited_url = []
+
         self._create_event()
         self._create_threads()
         self._init_queue()
@@ -48,7 +49,7 @@ class ThreadPool(object):
             self.events.append(event)
 
     def _init_queue(self):
-        self.queue.put((do_parse, self.root_url))
+        self.queue.put((do_page_parse, self.root_url))
 
     def get_thread(self):
         global EVENT
@@ -76,7 +77,7 @@ class ThreadPool(object):
 
 class PageParseThread(threading.Thread):
     """
-        define a thread for parse the html
+        define a thread for parse the <a> tag
     """
     def __init__(self, queue, i, event, visited_url):
         threading.Thread.__init__(self,name='page_parser_thread_%d' % i)
@@ -96,11 +97,17 @@ class PageParseThread(threading.Thread):
                 EVENT.set()
                 if self.queue.empty():
                     MUTEX.acquire()
-                    func(url, self.parser)
+                    if url.startswith("http:"):
+                        func(url)
+                    else:
+                        func(url, self.parser)
                     if not self.queue.empty():
                         MUTEX.release()
                 else:
-                    func(url, self.parser)
+                    if url.startswith("http:"):
+                        func(url)
+                    else:
+                        func(url, self.parser)
                 self.queue.task_done()
                 self.event.clear() 
 

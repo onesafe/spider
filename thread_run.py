@@ -15,8 +15,8 @@ def get_html(url):
     request = urllib2.Request(url)
     try:
         response = urllib2.urlopen(request)
-        print response.getcode()
-        html_string = response.read()
+        if response.getcode() == 200:
+            html_string = response.read()
     except urllib2.URLError, e:
         if hasattr(e, 'reason'):
             print 'get server failed'
@@ -35,17 +35,45 @@ def get_real_url(url):
         return _ROOT_URL + '/' + url
 
 
-def do_parse(next_url,page_parser):
-    real_url = get_real_url(next_url)
+def do_page_parse(url, parser):
+    real_url = get_real_url(url)
     html_string = get_html(real_url)
     try:
         if html_string:
-            print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url) 
-            page_parser.feed(html_string)
+            # print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url) 
+            parser.feed(html_string)
     except UnicodeDecodeError:
         reload(sys)
         sys.setdefaultencoding('gb2312')
         try:
-            self.page_parser.feed(html_string)
+            self.parser.feed(html_string)
         except UnicodeDecodeError:
             failed_page += 1
+
+def get_image(url):
+    url_list = list(url)
+    order = 1
+    while order > 0:
+        url_list[-5] = str(order)
+        url_new = ''.join(url_list)
+        print url_new
+        request = urllib2.Request(url_new)
+        order += 1
+        try:
+            response = urllib2.urlopen(request)
+        except urllib2.HTTPError, e:
+            if e.code == 404:
+                order = -1 
+            else:
+                print e.code
+        else:
+            image_name = url_new[7:-4]
+            image_name_new = image_name.replace('/', '_')
+            image_name_new = image_name_new.replace('.', '_')
+            image_name_new = image_name_new + '.jpg'
+            f = open('./images/'+image_name_new, 'wb+')
+            f.write(response.read())
+            f.close()
+
+def do_image_parse(image_link):
+    get_image(image_link)
