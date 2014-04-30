@@ -1,0 +1,33 @@
+.big_images {
+    width: 100%;
+    padding: 0 0px;
+    margin: 0 0%;
+}
+
+.div_whole {
+    width: 100%;
+    background-color: #E16642;
+}
+
+.nav {
+    margin-bottom: 0;
+    border: 0px;
+}
+
+.nav .collapse
+{
+    background-color: #E16642;
+}
+
+/*.btn_control_left {
+    margin: 0 20%;
+}
+
+.btn_control_right {
+    margin: 0 20%;
+}*/
+
+#carousel {
+    width: 33.5%;
+    margin: 0 auto;
+}
