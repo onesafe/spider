@@ -20,18 +20,20 @@ EVENT = threading.Event()
 
 COUNT = 0
 
+
 class ThreadPool(object):
     """
         handout and recyle the threads
     """
-    def __init__(self, threads_num, root_url):
+    def __init__(self, threads_num, root_url, image_group_num):
         self.root_url = root_url
         self.threads = []
         self.events = []
         self.queue = Queue.Queue()
         self.max_threads_num = threads_num
+        self.image_group_num = image_group_num
         self.visited_url = []
-
+        self.visited_url_length = len(self.visited_url)
         self._create_event()
         self._create_threads()
         self._init_queue()
@@ -70,9 +72,16 @@ class ThreadPool(object):
         else:
             return True
 
-    def get_visited(self):
-        print "fuckfuckfuckfuckfuck %d" % len(self.visited_url)
-
+    def check_image_count(self):
+        global COUNT
+        if self.image_group_num == -2:
+            return True
+        else:
+            if COUNT < self.image_group_num - 1:
+                return True
+            else:
+                print COUNT
+                return False
 
 
 class PageParseThread(threading.Thread):
@@ -106,24 +115,49 @@ class PageParseThread(threading.Thread):
                 else:
                     if url.startswith("http:"):
                         func(url)
+                        COUNT += 1
+                        print "test: %d " % COUNT
                     else:
                         func(url, self.parser)
                 self.queue.task_done()
                 self.event.clear() 
 
 
-if __name__ == '__main__':
+def run_main():
     root_url = "/"
-    pool = ThreadPool(5,root_url)
-    EVENT.set()
-    while pool.check_queue():
-        EVENT.wait()
-        pool.get_thread()
-        # pool.get_visited()
+    image_group_num = deal_argv()
+    if not image_group_num == -1:
+        pool = ThreadPool(5,root_url, image_group_num)
+        EVENT.set()
+        while pool.check_queue():
+            EVENT.wait()
+            pool.get_thread()
+            if not pool.check_image_count():
+                print "finished"
+                break
 
+def deal_argv():
+    if len(sys.argv) <= 2 :
+        try:
+            image_group_num = int(sys.argv[1])
+            if image_group_num > 0:
+                return image_group_num
+            else:
+                print "arguments error,only one and integer(>0)"
+                return -1
+        except IndexError:
+            image_group_num = -2
+            print "sda"
+            return image_group_num
+        except ValueError:
+            print "arguments type error,please input integer!"
+        
+    else:
+        print "arguments error,only one and integer"
+        return -1
 
+if __name__ == '__main__':
+     run_main()
 
-
-
-
+    
 

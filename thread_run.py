@@ -2,12 +2,12 @@
 # -*- coding:utf-8 -*-
 
 import sys
+import os
 import urllib2
 import threading
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 
 _ROOT_URL = 'http://www.22mm.cc'
 
@@ -40,7 +40,7 @@ def do_page_parse(url, parser):
     html_string = get_html(real_url)
     try:
         if html_string:
-            # print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url) 
+            print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url)
             parser.feed(html_string)
     except UnicodeDecodeError:
         reload(sys)
@@ -50,13 +50,32 @@ def do_page_parse(url, parser):
         except UnicodeDecodeError:
             failed_page += 1
 
+def deal_dir(image_path):
+    image_path_list = image_path.split('/')
+    current_dir = './'
+    current_dir += 'mm_image/'
+    
+    if not os.path.exists(current_dir):
+        os.mkdir(current_dir)
+    current_dir += 'images/'
+
+    if not os.path.exists(current_dir):
+        os.mkdir(current_dir)
+
+    for path in image_path_list[2:-1]:
+        current_dir += path
+        current_dir += '/'
+        if not os.path.exists(current_dir):
+            os.mkdir(current_dir)
+
+    return current_dir  + image_path_list[-1]
+
 def get_image(url):
     url_list = list(url)
     order = 1
     while order > 0:
         url_list[-5] = str(order)
         url_new = ''.join(url_list)
-        print url_new
         request = urllib2.Request(url_new)
         order += 1
         try:
@@ -67,13 +86,13 @@ def get_image(url):
             else:
                 print e.code
         else:
-            image_name = url_new[7:-4]
-            image_name_new = image_name.replace('/', '_')
-            image_name_new = image_name_new.replace('.', '_')
-            image_name_new = image_name_new + '.jpg'
-            f = open('./images/'+image_name_new, 'wb+')
-            f.write(response.read())
-            f.close()
+			image_path_pre = url_new[7:]
+			# print "saving image %s" % image_path_pre
+			image_path = deal_dir(image_path_pre)
+			f = open(image_path, 'wb+')
+			f.write(response.read())
+			f.close()
+			print "saved image successfully: %s" % image_path
 
 def do_image_parse(image_link):
     get_image(image_link)
