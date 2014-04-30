@@ -4,4 +4,4 @@ from django.http import HttpResponse
 
 
 def test(request):
-    return HttpResponse("it's a test!")
+    return render(request, 'index.html',)

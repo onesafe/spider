@@ -3,6 +3,6 @@ from django.http import HttpResponse
 
 
 
-def test(request):
-    return HttpResponse("it's a test!")
+def test(request, catagory):
+    return HttpResponse("catagory: %s" % catagory) 
 

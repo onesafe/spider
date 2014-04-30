@@ -25,8 +25,7 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = (
-    'app_index/templates/',
-    'app_explore_image/templates/',
+    './templates/'
     )
 
 ALLOWED_HOSTS = []
