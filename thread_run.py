@@ -99,8 +99,8 @@ def get_image(url):
                 f.write(response.read())
                 f.close()
                 image_info = image_path.split('/')
-                image_catagory = image_info[2]
-                image_group = image_info[2] + '_' + image_info[3]
+                image_catagory = image_info[3]
+                image_group = image_info[4] + '_' + image_info[5]
                 image_upload_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 
                 database_options.store_image_info(conn, image_path, image_catagory, image_group, 0, 0, image_upload_time)  
