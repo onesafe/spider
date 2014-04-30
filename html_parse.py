@@ -24,4 +24,4 @@ class MMHtmlParse(HTMLParser):
                         url_split = attr[1].split('.')
                         if url_split[1] == 'meimei22' and attr[1].endswith('/0.jpg'):
                             self.queue.put((do_image_parse,attr[1]))
-                            print "image_url: %s \n" % attr[1]
+                            # print "image_url: %s \n" % attr[1]
