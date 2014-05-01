@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>看美女啦！</title>    
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css">
+    <link rel="stylesheet" type="text/css" href="css/kind_template.css">
+</head>
+<body>
+    <div id="whole" class="container div_whole">
+        <div class="col-lg-3">
+            <div id="masonry" class="container-fluid">
+                <div  class="thumbnail"> 
+                    {% for path, praise, step in 1_column %}
+                    <div class="photo_box">
+                        <div id="images" class="imgs"> 
+                            <img class="img-rounded" src="{{ path }}" /> 
+                        </div> 
+                        <div class="caption">
+                            <div class="btn_group btn-group ">
+                                <button  type="button" class="btn_praise btn btn-success">赞一个 {{ praise }}</button>
+                                <button  type="button" class="btn_step btn btn-warning">踩你 {{ step }}</button>
+                            </div>
+                        </div> 
+                    </div>
+                    {% endfor %}
+                </div> 
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div id="masonry" class="container-fluid">
+                <div  class="thumbnail"> 
+                    {% for path, praise, step in 2_column %}
+                    <div class="photo_box">
+                    <div id="images" class="imgs"> 
+                        <img class="img-rounded" src="{{ path }}" /> 
+                    </div> 
+                    <div class="caption">
+                        <div class="btn_group btn-group ">
+                            <button  type="button" class="btn_praise btn btn-success">赞一个 {{ praise }}</button>
+                            <button  type="button" class="btn_step btn btn-warning">踩你 {{ step }}</button>
+                        </div>
+                    </div> 
+                    </div>
+                    {% endfor %}
+                </div> 
+            </div>
+        </div>     
+        <div class="col-lg-3">
+            <div id="masonry" class="container-fluid">
+                <div  class="thumbnail"> 
+                    {% for path, praise, step in 3_column %}
+                    <div class="photo_box">
+                    <div id="images" class="imgs"> 
+                        <img class="img-rounded" src="{{ path }}" /> 
+                    </div> 
+                    <div class="caption">
+
+                        <div class="btn_group btn-group ">
+                            <button  type="button" class="btn_praise btn btn-success">赞一个 {{ praise }}</button>
+                            <button  type="button" class="btn_step btn btn-warning">踩你 {{ step }}</button>
+                        </div>
+                    </div> 
+                    </div>
+                    {% endfor %}
+                </div> 
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div id="masonry" class="container-fluid">
+                <div  class="thumbnail"> 
+                    {% for path, praise, step in 4_column %}
+                    <div class="photo_box">
+                    <div id="images" class="imgs"> 
+                        <img class="img-rounded" src="{{ path }}" /> 
+                    </div> 
+                    <div class="caption">
+                        <div class="btn_group btn-group ">
+                            <button  type="button" class="btn_praise btn btn-success">赞一个 {{ praise }}</button>
+                            <button  type="button" class="btn_step btn btn-warning">踩你 {{ step }}</button>
+                        </div>
+                    </div> 
+                    </div>
+                    {% endfor %}
+                </div> 
+            </div>
+        </div>                                   
+    </div>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>  
+    <script type="text/javascript" src="js/kind_template.js"></script>
+</body>
+</html>

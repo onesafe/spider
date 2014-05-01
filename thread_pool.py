@@ -102,7 +102,8 @@ class PageParseThread(threading.Thread):
             self.event.wait()
             if not self.queue.empty():
                 func, url = self.queue.get()
-                self.visited_url.append(url)            
+                if self.visited_url.count(url) == 0:
+                    self.visited_url.append(url)
                 EVENT.set()
                 if self.queue.empty():
                     MUTEX.acquire()

@@ -20,8 +20,7 @@ class MMHtmlParse(HTMLParser):
                         self.queue.put((do_page_parse, attr[1]))
         if tag == 'img':
                 for attr in attrs:
-                    if attr[0] == 'src':
+                    if attr[0] == 'src' and self.visited_url.count(attr[1]) == 0:
                         url_split = attr[1].split('.')
                         if url_split[1] == 'meimei22' and attr[1].endswith('/0.jpg'):
                             self.queue.put((do_image_parse,attr[1]))
-                            # print "image_url: %s \n" % attr[1]

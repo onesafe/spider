@@ -5,6 +5,8 @@ import sys
 import os
 import urllib2
 import threading
+import time
+import database_options 
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -46,53 +48,93 @@ def do_page_parse(url, parser):
         reload(sys)
         sys.setdefaultencoding('gb2312')
         try:
-            self.parser.feed(html_string)
+            parser.feed(html_string)
         except UnicodeDecodeError:
             failed_page += 1
 
-def deal_dir(image_path):
-    image_path_list = image_path.split('/')
+
+def deal_dir(url):
+    image_path_list = url.split('/')
+    header = image_path_list[0].split('.')[0]
     current_dir = './'
     current_dir += 'mm_image/'
-    
+
     if not os.path.exists(current_dir):
         os.mkdir(current_dir)
+
+
     current_dir += 'images/'
 
     if not os.path.exists(current_dir):
         os.mkdir(current_dir)
 
-    for path in image_path_list[2:-1]:
+    for i, path in enumerate(image_path_list[2:-1]):
         current_dir += path
+        if i == 1:
+            current_dir += '_'
+            current_dir += header
         current_dir += '/'
         if not os.path.exists(current_dir):
+            print "building dir : %s"  % current_dir
             os.mkdir(current_dir)
 
-    return current_dir  + image_path_list[-1]
+def get_path(url):
+    image_path_list = url.split('/')
+    header = image_path_list[0].split('.')[0]
+    current_dir = './'
+    current_dir += 'mm_image/'
+    current_dir += 'images/'
+    for i, path in enumerate(image_path_list[2:-1]):
+        current_dir += path
+        if i == 1:
+            current_dir += '_'
+            current_dir += header
+        current_dir += '/'
+    return current_dir
+
 
 def get_image(url):
     url_list = list(url)
     order = 1
+    conn = database_options.connect_db()
     while order > 0:
+        current_dir = get_path(url[7:])
         url_list[-5] = str(order)
         url_new = ''.join(url_list)
-        request = urllib2.Request(url_new)
-        order += 1
-        try:
-            response = urllib2.urlopen(request)
-        except urllib2.HTTPError, e:
-            if e.code == 404:
-                order = -1 
+        image_path = current_dir + str(order) + '.jpg'            
+        if database_options.check_repeat(conn, image_path):
+            deal_dir(url[7:])
+            request = urllib2.Request(url_new)
+            if image_path == "./mm_image/images/jingyan/2014-4-28_jyimg1/1/1.jpg":
+                    print "sbsdaafsafsdfsdafsdfsdafsdafsdfsdafsdafsdafsdafsdafsdfsd   %s " % url_new
+            order += 1
+            try:
+                response = urllib2.urlopen(request)
+
+            except urllib2.HTTPError, e:
+                if e.code == 404:
+                    order = -1 
+                else:
+                    print e.code
+                if image_path == "./mm_image/images/jingyan/2014-4-28_jyimg1/1/1.jpg":
+                    print "caocacaccccccccccccccccccccccccccc"
             else:
-                print e.code
+                f = open(image_path, 'wb+')
+                f.write(response.read())
+                f.close()
+                image_info = image_path.split('/')
+                image_catagory = image_info[3]
+                image_group = image_info[4] + '_' + image_info[5]
+                image_upload_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+                if image_path.endswith('/1.jpg'):
+                    image_cover = 1
+                else:
+                    image_cover = 0
+                database_options.store_image_info(conn, image_path, image_catagory, image_group, 0, 0, image_upload_time, image_cover)  
+                print "saved image successfully: %s" % image_path
         else:
-			image_path_pre = url_new[7:]
-			# print "saving image %s" % image_path_pre
-			image_path = deal_dir(image_path_pre)
-			f = open(image_path, 'wb+')
-			f.write(response.read())
-			f.close()
-			print "saved image successfully: %s" % image_path
+            break
+    database_options.close_db(conn)
 
 def do_image_parse(image_link):
     get_image(image_link)
