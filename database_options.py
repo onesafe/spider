@@ -8,10 +8,10 @@ def connect_db():
     conn = MySQLdb.connect(host='127.0.0.1',user='root',passwd='shangbo123',db='mm_image',charset='utf8')
     return conn
 
-def store_image_info(conn, path, catagory, group, praise, step, upload_date):
+def store_image_info(conn, path, catagory, group, praise, step, upload_date, cover):
     cur = conn.cursor()
-    cur.execute("insert into app_explore_image_picture(image_path, image_catagory, image_group, image_praise, image_step, image_upload_date)"
-        "values('%s', '%s', '%s', %d, %d, '%s') " % (path, catagory, group, praise, step, upload_date))
+    cur.execute("insert into app_explore_image_picture(image_path, image_catagory, image_group, image_praise, image_step, image_upload_date, image_cover)"
+        "values('%s', '%s', '%s', %d, %d, '%s', %d) " % (path, catagory, group, praise, step, upload_date, cover))
     conn.commit()
     cur.close()
 

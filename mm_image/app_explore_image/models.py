@@ -7,3 +7,4 @@ class Picture(models.Model):
     image_praise = models.IntegerField("praise")
     image_step = models.IntegerField("step") 
     image_upload_date = models.DateTimeField("upload_date_time", auto_now=True)
+    image_cover = models.IntegerField("cover")
