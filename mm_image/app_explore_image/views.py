@@ -11,7 +11,9 @@ def get_cover(request, catagory):
     album_cover_path_list_3_column = []
     album_cover_path_list_4_column = []
 
-    album_object_tuple = Picture.objects.filter(image_catagory = catagory)
+    album_object_tuple = Picture.objects.filter(image_catagory = catagory).order_by('-image_praise','image_step')
+    # if catagory = 'cars':
+    #     print len
     for i, obj in enumerate(album_object_tuple):
         image_path_list = obj.image_path.split('/')
         relatively_image_path = '/'
@@ -35,6 +37,7 @@ def error(request):
 @csrf_exempt
 def praise(request):
     if request.method == 'POST':
+
         path = './mm_image/images/' + dict(request.POST.iterlists())['path'][0]
         print path
         praise_item = Picture.objects.filter(image_path = path)
@@ -57,3 +60,4 @@ def step(request):
         step_item.update(image_step = tmp)
         
     return HttpResponse(tmp)
+
