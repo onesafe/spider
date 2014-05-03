@@ -6,6 +6,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def get_cover(request, catagory):
+    """
+        get web page's Pictures
+
+        args:
+            request: http request
+            catagory: a url argument
+        return:
+            a response to browser
+    """
     album_cover_path_list_1_column = []
     album_cover_path_list_2_column = []
     album_cover_path_list_3_column = []
@@ -32,10 +41,18 @@ def get_cover(request, catagory):
                                                 '3_column':album_cover_path_list_3_column,'4_column':album_cover_path_list_4_column,})
 
 def error(request):
+    """
+        when get a error url ,return 
+    """
     return HttpResponse("<h1>a error</h1>")
 
 @csrf_exempt
 def praise(request):
+    """
+        when clicked the praise button, image_praise add 1
+        return :
+            current image_praise number
+    """
     if request.method == 'POST':
 
         path = './mm_image/images/' + dict(request.POST.iterlists())['path'][0]
@@ -50,6 +67,11 @@ def praise(request):
 
 @csrf_exempt
 def step(request):
+    """
+       when clicked the step button, image_step add 1
+        return :
+            current image_step number
+    """
     if request.method == 'POST':
         path = './mm_image/images/' + dict(request.POST.iterlists())['path'][0]
         print path

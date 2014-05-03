@@ -6,7 +6,9 @@ from HTMLParser import HTMLParser
 from thread_run import do_page_parse, do_image_parse
 
 class MMHtmlParse(HTMLParser):
-
+    """
+        this is a html parser class,parsed tag 'a' and 'img'
+    """
     def __init__(self, queue, visited_url):
         HTMLParser.__init__(self)
         self.queue = queue
