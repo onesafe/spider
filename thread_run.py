@@ -14,6 +14,13 @@ sys.setdefaultencoding('utf-8')
 _ROOT_URL = 'http://www.22mm.cc'
 
 def get_html(url):
+    """
+        used urllib2 to get html 
+        args:
+            a section of url
+        return:
+            a section of html string
+    """
     request = urllib2.Request(url)
     try:
         response = urllib2.urlopen(request)
@@ -31,6 +38,13 @@ def get_html(url):
 
 
 def get_real_url(url):
+    """
+        transform relative url to absolute url
+        args:
+            relative url
+        return:
+            absolute url
+    """
     if url.startswith('/'):
         return _ROOT_URL + url
     if url.startswith('mm'):
@@ -38,6 +52,14 @@ def get_real_url(url):
 
 
 def do_page_parse(url, parser):
+    """
+        do web page parsed,the function will be packaged into a queue,be called by a parse thread 
+        args:
+            a absolute url
+            a parser: it's a class in file "html_parse.py"
+        return:
+            no
+    """
     real_url = get_real_url(url)
     html_string = get_html(real_url)
     try:
@@ -54,6 +76,13 @@ def do_page_parse(url, parser):
 
 
 def deal_dir(url):
+    """
+        deal directory:create that don't exist directory 
+        args:
+            url
+        return:
+            no
+    """
     image_path_list = url.split('/')
     header = image_path_list[0].split('.')[0]
     current_dir = './'
@@ -79,6 +108,9 @@ def deal_dir(url):
             os.mkdir(current_dir)
 
 def get_path(url):
+    """
+        across url to get the images path in the computer
+    """
     image_path_list = url.split('/')
     header = image_path_list[0].split('.')[0]
     current_dir = './'
@@ -94,6 +126,9 @@ def get_path(url):
 
 
 def get_image(url):
+    """
+        across url to download images
+    """
     url_list = list(url)
     order = 1
     conn = database_options.connect_db()
@@ -105,8 +140,6 @@ def get_image(url):
         if database_options.check_repeat(conn, image_path):
             deal_dir(url[7:])
             request = urllib2.Request(url_new)
-            if image_path == "./mm_image/images/jingyan/2014-4-28_jyimg1/1/1.jpg":
-                    print "sbsdaafsafsdfsdafsdfsdafsdafsdfsdafsdafsdafsdafsdafsdfsd   %s " % url_new
             order += 1
             try:
                 response = urllib2.urlopen(request)
@@ -116,8 +149,6 @@ def get_image(url):
                     order = -1 
                 else:
                     print e.code
-                if image_path == "./mm_image/images/jingyan/2014-4-28_jyimg1/1/1.jpg":
-                    print "caocacaccccccccccccccccccccccccccc"
             else:
                 f = open(image_path, 'wb+')
                 f.write(response.read())

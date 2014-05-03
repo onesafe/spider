@@ -1,0 +1,9 @@
+.nav {
+    margin-bottom: 0;
+    border: 0px;
+}
+
+.nav .collapse
+{
+    background-color: #E16642;
+}
