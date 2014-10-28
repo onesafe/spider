@@ -7,16 +7,15 @@
 
 
 ## 内容: ##
-1. 一个爬虫:由**html_ptase.py thread_pool.py,thread_run.py,database_options.py**组成
+1. 一个爬虫:由`html_ptase.py thread_pool.py,thread_run.py,database_options.py`组成
 2. 一个网站:在目录mm_image中.
 
 ## 运行方式: ##
 1. 创建数据库.(mysql)
     * 使用命令进入数据库:   
-```
-mysql -u root -p
-```
-    * 在数据库shell下面 使用 source path建立数据库(path为本目录下面的**mm_image/sql/ceate_database.sql**)运行
+`mysql -u root -p`
+
+    * 在数据库shell下面 使用 source path建立数据库(path为本目录下面的`mm_image/sql/ceate_database.sql`)运行
 
 2. 创建表:
     * 在mm_image下面运行命令  
@@ -32,8 +31,8 @@ mysql -u root -p
     *若感觉已经足够:可以关闭运行爬虫的shell.最好通过ctrl+c来停止.(这里没有做优化)
 
 4. 运行网站:
-    * 进入**mm_image/**
-    * 运行  ```python manage.py runserver```
+    * 进入`mm_image/`
+    * 运行  `python manage.py runserver`
     * 打开浏览器,输入http://127.0.0.1:8000
     * 首页里面是获取的点赞数最多的图片的大图轮播.
     * 点击左上角的分类,可进入不同的分类

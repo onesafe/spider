@@ -14,11 +14,11 @@ from thread_run import do_page_parse
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-MUTEX = threading.Lock()
+MUTEX = threading.Lock()                         
 
-EVENT = threading.Event()
+# EVENT = threading.Event()
 
-COUNT = 0
+# COUNT = 0
 
 
 class ThreadPool(object):
@@ -37,11 +37,11 @@ class ThreadPool(object):
         self._create_event()
         self._create_threads()
         self._init_queue()
-
+        self.count = [0, ]                                       # add
     def _create_threads(self):
         for i in range(self.max_threads_num):
             event = self.events[i]
-            thread = PageParseThread(self.queue, i+1, event, self.visited_url)
+            thread = PageParseThread(self.queue, i+1, event, self.visited_url, self.count)          # modified
             self.threads.append(thread)
             thread.start()
 
@@ -54,10 +54,10 @@ class ThreadPool(object):
         self.queue.put((do_page_parse, self.root_url))
 
     def get_thread(self):
-        global EVENT
+        # global EVENT
         for i, event in enumerate(self.events):
             if not event.isSet():
-                EVENT.clear()
+        #        EVENT.clear()
                 event.set()
                 return i
         return False
@@ -73,14 +73,12 @@ class ThreadPool(object):
             return True
 
     def check_image_count(self):
-        global COUNT
         if self.image_group_num == -2:
             return True
         else:
-            if COUNT < self.image_group_num - 1:
+            if self.count[0] < self.image_group_num - 1:
                 return True
             else:
-                print COUNT
                 return False
 
 
@@ -88,27 +86,27 @@ class PageParseThread(threading.Thread):
     """
         define a thread for parse the <a> tag
     """
-    def __init__(self, queue, i, event, visited_url):
+    def __init__(self, queue, i, event, visited_url, count):                         # modified
         threading.Thread.__init__(self,name='page_parser_thread_%d' % i)
         self.queue = queue
         self.event = event
         self.visited_url = visited_url
         self.parser = MMHtmlParse(self.queue, self.visited_url)
-        
+        self.image_count = count
     def run(self):
-        global EVENT
-        global COUNT
+        # global EVENT
         while True:
             self.event.wait()
             if not self.queue.empty():
                 func, url = self.queue.get()
                 if self.visited_url.count(url) == 0:
                     self.visited_url.append(url)
-                EVENT.set()
+          #      EVENT.set()
                 if self.queue.empty():
                     MUTEX.acquire()
                     if url.startswith("http:"):
                         func(url)
+                        self.image_count[0] += 1                          # modified
                     else:
                         func(url, self.parser)
                     if not self.queue.empty():
@@ -116,7 +114,7 @@ class PageParseThread(threading.Thread):
                 else:
                     if url.startswith("http:"):
                         func(url)
-                        COUNT += 1
+                        self.image_count[0] += 1                           # modified
                         print "test: %d " % COUNT
                     else:
                         func(url, self.parser)
@@ -129,9 +127,9 @@ def run_main():
     image_group_num = deal_argv()
     if not image_group_num == -1:
         pool = ThreadPool(5,root_url, image_group_num)
-        EVENT.set()
+        # EVENT.set()
         while pool.check_queue():
-            EVENT.wait()
+        #    EVENT.wait()
             pool.get_thread()
             if not pool.check_image_count():
                 print "finished"
@@ -148,7 +146,7 @@ def deal_argv():
                 return -1
         except IndexError:
             image_group_num = -2
-            print "sda"
+
             return image_group_num
         except ValueError:
             print "arguments type error,please input integer!"

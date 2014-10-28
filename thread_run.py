@@ -13,7 +13,7 @@ sys.setdefaultencoding('utf-8')
 
 _ROOT_URL = 'http://www.22mm.cc'
 
-def get_html(url):
+def _get_html(url):
     """
         used urllib2 to get html 
         args:
@@ -37,7 +37,7 @@ def get_html(url):
         return html_string
 
 
-def get_real_url(url):
+def _get_real_url(url):
     """
         transform relative url to absolute url
         args:
@@ -51,31 +51,9 @@ def get_real_url(url):
         return _ROOT_URL + '/' + url
 
 
-def do_page_parse(url, parser):
-    """
-        do web page parsed,the function will be packaged into a queue,be called by a parse thread 
-        args:
-            a absolute url
-            a parser: it's a class in file "html_parse.py"
-        return:
-            no
-    """
-    real_url = get_real_url(url)
-    html_string = get_html(real_url)
-    try:
-        if html_string:
-            print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url)
-            parser.feed(html_string)
-    except UnicodeDecodeError:
-        reload(sys)
-        sys.setdefaultencoding('gb2312')
-        try:
-            parser.feed(html_string)
-        except UnicodeDecodeError:
-            failed_page += 1
 
 
-def deal_dir(url):
+def _deal_dir(url):
     """
         deal directory:create that don't exist directory 
         args:
@@ -107,7 +85,7 @@ def deal_dir(url):
             print "building dir : %s"  % current_dir
             os.mkdir(current_dir)
 
-def get_path(url):
+def _get_path(url):
     """
         across url to get the images path in the computer
     """
@@ -125,7 +103,7 @@ def get_path(url):
     return current_dir
 
 
-def get_image(url):
+def _get_image(url):
     """
         across url to download images
     """
@@ -133,12 +111,12 @@ def get_image(url):
     order = 1
     conn = database_options.connect_db()
     while order > 0:
-        current_dir = get_path(url[7:])
+        current_dir = _get_path(url[7:])
         url_list[-5] = str(order)
         url_new = ''.join(url_list)
         image_path = current_dir + str(order) + '.jpg'            
         if database_options.check_repeat(conn, image_path):
-            deal_dir(url[7:])
+            _deal_dir(url[7:])
             request = urllib2.Request(url_new)
             order += 1
             try:
@@ -167,5 +145,30 @@ def get_image(url):
             break
     database_options.close_db(conn)
 
+
 def do_image_parse(image_link):
-    get_image(image_link)
+    _get_image(image_link)
+
+
+def do_page_parse(url, parser):
+    """
+        do web page parsed,the function will be packaged into a queue,be called by a parse thread 
+        args:
+            a absolute url
+            a parser: it's a class in file "html_parse.py"
+        return:
+            no
+    """
+    real_url = _get_real_url(url)
+    html_string = _get_html(real_url)
+    try:
+        if html_string:
+            print '\n%s is dealing with the %s:' % (threading.currentThread().getName(), real_url)
+            parser.feed(html_string)
+    except UnicodeDecodeError:
+        reload(sys)
+        sys.setdefaultencoding('gb2312')
+        try:
+            parser.feed(html_string)
+        except UnicodeDecodeError:
+            failed_page += 1
