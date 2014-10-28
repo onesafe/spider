@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+#standard lib
 import sys
 import os
 import urllib2
-import threading
 import time
+
+#custom lib
 import database_options 
 
 reload(sys)
