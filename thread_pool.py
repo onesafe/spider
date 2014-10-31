@@ -14,7 +14,7 @@ from thread_run import do_page_parse
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-MUTEX = threading.Lock()                         
+MUTEX = threading.Lock()                        #全局变量锁,实现子线程互斥访问 
 
 # EVENT = threading.Event()
 
@@ -37,7 +37,9 @@ class ThreadPool(object):
         self._create_event()
         self._create_threads()
         self._init_queue()
-        self.count = [0, ]                                       # add
+        self.count = [0, ]              #add
+
+    #线程池初始化的时候初始化5个线程    
     def _create_threads(self):
         for i in range(self.max_threads_num):
             event = self.events[i]
@@ -45,14 +47,17 @@ class ThreadPool(object):
             self.threads.append(thread)
             thread.start()
 
+    #为每一个子线程配置一个事件同步机制，阻塞和唤醒子线程
     def _create_event(self):
         for i in range(self.max_threads_num):
             event = threading.Event()
             self.events.append(event)
 
+    #初始化url队列，将根目录放入队列
     def _init_queue(self):
         self.queue.put((do_page_parse, self.root_url))
 
+    #当队列中有未访问的url的时候，获取一个线程处理队首url
     def get_thread(self):
         # global EVENT
         for i, event in enumerate(self.events):
@@ -62,6 +67,7 @@ class ThreadPool(object):
                 return i
         return False
 
+    #检查队列中是否有未访问的url
     def check_queue(self):
         un_deal = 0
         for event in self.events:
@@ -72,6 +78,7 @@ class ThreadPool(object):
         else:
             return True
 
+    #若指定爬取图片的最大数目的时候，检查是否到达最大值
     def check_image_count(self):
         if self.image_group_num == -2:
             return True
@@ -84,37 +91,37 @@ class ThreadPool(object):
 
 class PageParseThread(threading.Thread):
     """
-        define a thread for parse the <a> tag
+        define a thread for parse the <a> and <img> tag
     """
     def __init__(self, queue, i, event, visited_url, count):                         # modified
         threading.Thread.__init__(self,name='page_parser_thread_%d' % i)
-        self.queue = queue
+        self.queue = queue      
         self.event = event
         self.visited_url = visited_url
-        self.parser = MMHtmlParse(self.queue, self.visited_url)
-        self.image_count = count
+        self.parser = MMHtmlParse(self.queue, self.visited_url)  #为每一个线程匹配一个html解析器
+        self.image_count = count                                 #图片计数
     def run(self):
         # global EVENT
         while True:
-            self.event.wait()
+            self.event.wait()                                    #使用event将线程阻塞在此处
             if not self.queue.empty():
                 func, url = self.queue.get()
                 if self.visited_url.count(url) == 0:
-                    self.visited_url.append(url)
+                    self.visited_url.append(url)      
           #      EVENT.set()
-                if self.queue.empty():
-                    MUTEX.acquire()
+                if self.queue.empty():                           #当取出最后一个url的时候做解析，可能会导入新的url
+                    MUTEX.acquire()          
                     if url.startswith("http:"):
                         func(url)
-                        self.image_count[0] += 1                          # modified
+                        self.image_count[0] += 1                                     # modified
                     else:
                         func(url, self.parser)
                     if not self.queue.empty():
                         MUTEX.release()
-                else:
+                else:                                  
                     if url.startswith("http:"):
                         func(url)
-                        self.image_count[0] += 1                           # modified
+                        self.image_count[0] += 1                                     # modified
                         print "test: %d " % COUNT
                     else:
                         func(url, self.parser)
