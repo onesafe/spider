@@ -4,7 +4,7 @@
 import MySQLdb
 
 
-def connect_db():
+def _connect_db():
     """
         connect db
     """
@@ -15,10 +15,11 @@ def connect_db():
         return 0
     
 
-def store_image_info(conn, path, catagory, group, praise, step, upload_date, cover):
+def store_image_info(path, catagory, group, praise, step, upload_date, cover):
     """
          store image info image info into db
     """
+    conn = _connect_db()
     if conn:
         try:                        # add exception
             cur = conn.cursor()
@@ -30,12 +31,14 @@ def store_image_info(conn, path, catagory, group, praise, step, upload_date, cov
             return 0
         finally:
             cur.close()
+            conn.close()
 
-def check_repeat(_conn, _path):
+def check_repeat(_path):
     """
         check image path whether repeat
     """
-    if _conn and _path:                       #add exception
+    conn = _connect_db()
+    if conn and _path:                       #add exception
         try:
             cur = _conn.cursor()
             cur.execute("select id from app_explore_image_picture where image_path='%s'" % (_path))
@@ -45,6 +48,8 @@ def check_repeat(_conn, _path):
             else:
                 return False
         except MySQLdb.OperationalError:
+            cur.close()
+            conn.close()
             return False
 
 

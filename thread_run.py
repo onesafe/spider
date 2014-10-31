@@ -111,13 +111,13 @@ def _get_image(url):
     """
     url_list = list(url)
     order = 1
-    conn = database_options.connect_db()
+    #conn = database_options.connect_db()
     while order > 0:
         current_dir = _get_path(url[7:])
         url_list[-5] = str(order)
         url_new = ''.join(url_list)
         image_path = current_dir + str(order) + '.jpg'            
-        if database_options.check_repeat(conn, image_path):
+        if database_options.check_repeat(image_path):
             _deal_dir(url[7:])
             request = urllib2.Request(url_new)
             order += 1
@@ -141,11 +141,10 @@ def _get_image(url):
                     image_cover = 1
                 else:
                     image_cover = 0
-                database_options.store_image_info(conn, image_path, image_catagory, image_group, 0, 0, image_upload_time, image_cover)  
+                database_options.store_image_info(image_path, image_catagory, image_group, 0, 0, image_upload_time, image_cover)  
                 print "saved image successfully: %s" % image_path
         else:
             break
-    database_options.close_db(conn)
 
 
 def do_image_parse(image_link):
