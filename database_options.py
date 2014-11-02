@@ -14,7 +14,6 @@ def _connect_db():
     except MySQLdb.OperationalError:
         return 0
     
-
 def store_image_info(path, catagory, group, praise, step, upload_date, cover):
     """
          store image info image info into db
@@ -51,7 +50,6 @@ def check_repeat(_path):
             cur.close()
             conn.close()
             return False
-
 
 def close_db(conn):
     conn.close()

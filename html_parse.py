@@ -1,18 +1,28 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+#standard module
 from HTMLParser import HTMLParser
+import Queue
 
-from thread_run import do_page_parse, do_image_parse
+#custom module
+from thread_deal_functions import do_page_parse, do_image_parse
 
 class MMHtmlParse(HTMLParser):
     """
         this is a html parser class,parsed tag 'a' and 'img'
     """
-    def __init__(self, queue, visited_url):
+    def __init__(self, queue=None, visited_url=None):
         HTMLParser.__init__(self)
-        self.queue = queue
-        self.visited_url = visited_url
+        if isinstance(queue, Queue.Queue):                  # add for robustness and  coupling
+            self.queue = queue
+        else:
+            self.queue = Queue.Queue()                      
+
+        if isinstance(visited_url,list):                    # add for robustness and  coupling
+            self.visited_url = visited_url
+        else:
+            self.visited_url = []
     
     def handle_starttag(self, tag, attrs):
         if tag == 'a':
